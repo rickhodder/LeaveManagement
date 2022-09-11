@@ -14,16 +14,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LeaveManagement.Web.Controllers
 {
-    [Authorize(Roles=Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public class LeaveTypesController : Controller
     {
         private readonly ILeaveTypeRepository _context;
         private readonly IMapper _mapper;
+        private readonly ILeaveAllocationRepository _leaveAllocationRepository;
 
-        public LeaveTypesController(ILeaveTypeRepository repository, IMapper mapper)
+        public LeaveTypesController(ILeaveTypeRepository repository, IMapper mapper, ILeaveAllocationRepository leaveAllocationRepository)
         {
             _context = repository;
             _mapper = mapper;
+            _leaveAllocationRepository = leaveAllocationRepository;
         }
 
         // GET: LeaveTypes
@@ -41,7 +43,7 @@ namespace LeaveManagement.Web.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             var leaveType = await _context.GetAsync(id);
-            
+
             if (leaveType == null)
             {
                 return NotFound();
@@ -106,7 +108,7 @@ namespace LeaveManagement.Web.Controllers
                     await _context.UpdateAsync(leaveType);
                 }
                 catch (DbUpdateConcurrencyException)
-                { 
+                {
                     if (!await _context.Exists(leaveTypeVM.Id))
                     {
                         return NotFound();
@@ -135,7 +137,15 @@ namespace LeaveManagement.Web.Controllers
         private async Task<bool> LeaveTypeExists(int id)
         {
             return await _context.GetAsync(id) != null;
-            
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AllocateLeave(int id)
+        {
+            await _leaveAllocationRepository.LeaveAllocation(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

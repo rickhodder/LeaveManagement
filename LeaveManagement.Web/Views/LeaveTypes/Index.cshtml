@@ -32,8 +32,9 @@
                     @Html.DisplayFor(modelItem => item.DefaultDays)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning"><i class="far fa-edit "></i></a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info"><i class="fas fa-circle-info"></i></a> |
+                    <button class="btn btn-primary allocateBtn" data-id="@item.Id" type="button">Allocate Leave</button>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning"><i class="far fa-edit "></i></a> 
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info"><i class="fas fa-circle-info"></i></a> 
                     <button class="btn btn-danger deleteBtn" data-id="@item.Id" type="button"><i class="far fa-trash-can"></i></button>
                 </td>
             </tr>
@@ -43,6 +44,10 @@
 
 <form id="deleteForm" asp-action="Delete">
     <input type="hidden" id="leaveTypeId" name="Id" />
+</form>
+
+<form id="allocationForm" asp-action="AllocateLeave">
+    <input type="hidden" id="leaveTypeAllocationId" name="Id" />
 </form>
 
 @section Scripts
@@ -60,11 +65,29 @@
                     dangerMode: true
                 }).then((confirm) => {
                     if (confirm) {
-                        alert(confirm);
+                        //alert(confirm);
                         var btn = $(this);
                         var id = btn.data("id");
                         $("#leaveTypeId").val(id);
                         $("#deleteForm").submit();
+                    }
+                });
+            });
+
+            $('.allocateBtn').click(function (e) {
+                swal({
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to allocate this leave to all employees?',
+                    icon: 'warning',
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        //alert(confirm);
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $("#leaveTypeAllocationId").val(id);
+                        $("#allocationForm").submit();
                     }
                 });
             });
